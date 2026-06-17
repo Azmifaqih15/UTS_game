@@ -47,10 +47,10 @@ public class mobil : MonoBehaviour
     // =========================
     private void GetInput()
     {
-        horizontalInput = Input.GetAxis("Horizontal");
-        verticalInput = Input.GetAxis("Vertical");
+        horizontalInput = MobileCarInput.steeringInput;
+        verticalInput = MobileCarInput.throttleInput;
 
-        isBraking = Input.GetKey(KeyCode.Space);
+        isBraking = MobileCarInput.nitroPressed;
     }
 
     // =========================

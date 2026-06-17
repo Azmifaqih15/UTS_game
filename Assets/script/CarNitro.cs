@@ -26,7 +26,7 @@ public class CarNitro : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.LeftShift))
+        if (MobileCarInput.nitroPressed && !isNitroActive)
         {
             StartCoroutine(ActivateNitro());
         }
@@ -34,7 +34,7 @@ public class CarNitro : MonoBehaviour
 
     void FixedUpdate()
     {
-        float move = Input.GetAxis("Vertical");
+        float move = MobileCarInput.verticalInput;
 
         float speed = isNitroActive ? nitroSpeed : normalSpeed;
 

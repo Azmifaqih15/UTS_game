@@ -5,11 +5,9 @@ using System.Collections;
 public class FinishLine : MonoBehaviour
 {
     private bool hasStartedLap = false;
-
     private float lapTimer = 0f;
 
     public GameObject winUI;
-
     public float nextLevelDelay = 3f;
 
     void Update()
@@ -22,34 +20,41 @@ public class FinishLine : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Player"))
+        // Hanya Player yang dihitung
+        if (!other.CompareTag("Player"))
+            return;
+
+        LapTracker lapTracker = other.GetComponent<LapTracker>();
+
+        if (lapTracker == null)
+            return;
+
+        // Pertama kali melewati garis finish
+        if (!hasStartedLap)
         {
-            // Pertama kali melewati garis start
-            if (!hasStartedLap)
-            {
-                hasStartedLap = true;
+            hasStartedLap = true;
+            lapTimer = 0f;
 
-                lapTimer = 0f;
+            Debug.Log("Lap Dimulai!");
 
-                Debug.Log("Lap Dimulai!");
-            }
-            else
-            {
-                // Finish setelah 1 putaran
-                Debug.Log("FINISH!");
-
-                Debug.Log("Waktu Tempuh: " + lapTimer.ToString("F2") + " detik");
-
-                // Tampilkan UI YOU WIN
-                if (winUI != null)
-                {
-                    winUI.SetActive(true);
-                }
-
-                // Pindah level setelah delay
-                StartCoroutine(NextLevel());
-            }
+            return;
         }
+
+        // Harus sudah melewati checkpoint
+        if (!lapTracker.passedCheckpoint)
+            return;
+
+        lapTracker.passedCheckpoint = false;
+
+        Debug.Log("YOU WIN!");
+        Debug.Log("Waktu Tempuh: " + lapTimer.ToString("F2") + " detik");
+
+        if (winUI != null)
+        {
+            winUI.SetActive(true);
+        }
+
+        StartCoroutine(NextLevel());
     }
 
     IEnumerator NextLevel()
