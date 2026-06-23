@@ -6,15 +6,21 @@ public class mobil : MonoBehaviour
     private float verticalInput;
     private float currentSteerAngle;
     private float currentBrakeForce;
+    private float currentMotorForce;
     private bool isBraking;
+    private bool nitroPressed;
+    private Rigidbody rb;
+    
 
     // =========================
     // SETTINGS
     // =========================
     [Header("Car Settings")]
-    [SerializeField] private float motorForce = 1500f;
+    [SerializeField] private float normalMotorForce = 1500f;
+    [SerializeField] private float nitroMotorForce = 2500f;
     [SerializeField] private float brakeForce = 3000f;
     [SerializeField] private float maxSteerAngle = 30f;
+    [SerializeField] private ParticleSystem nitroFlame;
 
     // =========================
     // WHEEL COLLIDERS
@@ -34,9 +40,54 @@ public class mobil : MonoBehaviour
     [SerializeField] private Transform rearLeftWheelTransform;
     [SerializeField] private Transform rearRightWheelTransform;
 
+    private void Start()
+    {
+        currentMotorForce = normalMotorForce;
+
+        if (nitroFlame != null)
+        {
+            nitroFlame.Stop();
+        }
+    }
+
     private void FixedUpdate()
     {
+        // Cek apakah balapan sudah dimulai
+        if (!RaceCountdown.raceStarted)
+        {
+            rearLeftWheelCollider.motorTorque = 0;
+            rearRightWheelCollider.motorTorque = 0;
+
+            frontLeftWheelCollider.brakeTorque = brakeForce;
+            frontRightWheelCollider.brakeTorque = brakeForce;
+            rearLeftWheelCollider.brakeTorque = brakeForce;
+            rearRightWheelCollider.brakeTorque = brakeForce;
+
+            return;
+        }
+
         GetInput();
+
+        // Nitro ON/OFF
+        if (MobileCarInput.nitroPressed)
+        {
+            currentMotorForce = nitroMotorForce;
+
+            if (nitroFlame != null && !nitroFlame.isPlaying)
+            {
+                nitroFlame.Play();
+            }
+        }
+        else
+        {
+            currentMotorForce = normalMotorForce;
+
+            if (nitroFlame != null && nitroFlame.isPlaying)
+            {
+                nitroFlame.Stop();
+            }
+        }
+
         HandleMotor();
         HandleSteering();
         UpdateWheels();
@@ -47,10 +98,18 @@ public class mobil : MonoBehaviour
     // =========================
     private void GetInput()
     {
-        horizontalInput = MobileCarInput.steeringInput;
-        verticalInput = MobileCarInput.throttleInput;
+        if (!RaceCountdown.raceStarted)
+        {
+            horizontalInput = 0f;
+            verticalInput = 0f;
+            isBraking = true;
+            return;
+        }
 
-        isBraking = MobileCarInput.nitroPressed;
+        horizontalInput = MobileCarInput.horizontalInput;
+        verticalInput = MobileCarInput.verticalInput;
+
+        isBraking = MobileCarInput.isBraking;
     }
 
     // =========================
@@ -59,8 +118,8 @@ public class mobil : MonoBehaviour
     private void HandleMotor()
     {
         // RWD (penggerak belakang)
-        rearLeftWheelCollider.motorTorque = verticalInput * motorForce;
-        rearRightWheelCollider.motorTorque = verticalInput * motorForce;
+        rearLeftWheelCollider.motorTorque = verticalInput * currentMotorForce;
+        rearRightWheelCollider.motorTorque = verticalInput * currentMotorForce;
 
         // Brake
         currentBrakeForce = isBraking ? brakeForce : 0f;

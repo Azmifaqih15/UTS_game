@@ -11,6 +11,18 @@ public class SimpleAICar : MonoBehaviour
 
     void Update()
     {
+        // Tunggu countdown selesai
+        if (!RaceCountdown.raceStarted)
+        {
+            return;
+        }
+
+        // Cek apakah waypoint ada
+        if (waypoints.Length == 0)
+        {
+            return;
+        }
+
         Transform target = waypoints[currentWaypoint];
 
         Vector3 direction =

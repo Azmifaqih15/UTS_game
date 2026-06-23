@@ -2,54 +2,54 @@ using UnityEngine;
 
 public class MobileCarInput : MonoBehaviour
 {
-    public static float throttleInput;
-    public static float steeringInput;
-    public static bool nitroPressed;
+    public static float horizontalInput;
     public static float verticalInput;
 
+    public static bool isBraking;
+    public static bool nitroPressed;
 
     // GAS
     public void GasDown()
     {
-        throttleInput = 1f;
+        verticalInput = 1f;
     }
 
     public void GasUp()
     {
-        throttleInput = 0f;
+        verticalInput = 0f;
     }
 
-    // BRAKE
+    // REM
     public void BrakeDown()
     {
-        throttleInput = -1f;
+        isBraking = true;
     }
 
     public void BrakeUp()
     {
-        throttleInput = 0f;
+        isBraking = false;
     }
 
-    // LEFT
+    // KIRI
     public void LeftDown()
     {
-        steeringInput = -1f;
+        horizontalInput = -1f;
     }
 
     public void LeftUp()
     {
-        steeringInput = 0f;
+        horizontalInput = 0f;
     }
 
-    // RIGHT
+    // KANAN
     public void RightDown()
     {
-        steeringInput = 1f;
+        horizontalInput = 1f;
     }
 
     public void RightUp()
     {
-        steeringInput = 0f;
+        horizontalInput = 0f;
     }
 
     // NITRO
