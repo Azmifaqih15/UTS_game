@@ -11,6 +11,8 @@ public class SimpleAICar : MonoBehaviour
 
     void Update()
     {
+
+        
         // Tunggu countdown selesai
         if (!RaceCountdown.raceStarted)
         {

@@ -1,66 +1,41 @@
 using UnityEngine;
-using UnityEngine.SceneManagement;
-using System.Collections;
 
 public class FinishLine : MonoBehaviour
 {
-    private bool hasStartedLap = false;
-    private float lapTimer = 0f;
+    public GameObject winPanel;
+    public GameObject losePanel;
 
-    public GameObject winUI;
-    public float nextLevelDelay = 3f;
-
-    void Update()
-    {
-        if (hasStartedLap)
-        {
-            lapTimer += Time.deltaTime;
-        }
-    }
+    private bool raceFinished = false;
 
     private void OnTriggerEnter(Collider other)
     {
-        // Hanya Player yang dihitung
-        if (!other.CompareTag("Player"))
+        if (raceFinished)
             return;
 
-        LapTracker lapTracker = other.GetComponent<LapTracker>();
+        LapTracker lap = other.GetComponent<LapTracker>();
 
-        if (lapTracker == null)
+        if (lap == null)
             return;
 
-        // Pertama kali melewati garis finish
-        if (!hasStartedLap)
+        // Belum melewati checkpoint
+        if (!lap.passedCheckpoint)
+            return;
+
+        raceFinished = true;
+
+        Time.timeScale = 0f;
+
+        if (other.CompareTag("Player"))
         {
-            hasStartedLap = true;
-            lapTimer = 0f;
+            Debug.Log("PLAYER MENANG");
 
-            Debug.Log("Lap Dimulai!");
-
-            return;
+            winPanel.SetActive(true);
         }
-
-        // Harus sudah melewati checkpoint
-        if (!lapTracker.passedCheckpoint)
-            return;
-
-        lapTracker.passedCheckpoint = false;
-
-        Debug.Log("YOU WIN!");
-        Debug.Log("Waktu Tempuh: " + lapTimer.ToString("F2") + " detik");
-
-        if (winUI != null)
+        else if (other.CompareTag("AI"))
         {
-            winUI.SetActive(true);
+            Debug.Log("PLAYER KALAH");
+
+            losePanel.SetActive(true);
         }
-
-        StartCoroutine(NextLevel());
-    }
-
-    IEnumerator NextLevel()
-    {
-        yield return new WaitForSeconds(nextLevelDelay);
-
-        SceneManager.LoadScene("level 2");
     }
 }
